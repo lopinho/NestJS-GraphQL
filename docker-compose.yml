@@ -1,0 +1,38 @@
+version: '3.3'
+services:
+  dev:
+    container_name: nestjs_graphql_dev
+    image: nestjs_graphql_dev:1.0.0
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    ports:
+      - 5000:5000
+      - 3001:9229
+    networks:
+      - nesjs-graphql-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    environment:
+      MONGO_URL: 'root:pass12345@mongodb'
+  mongodb:
+    image: mongo:5.0.0
+    container_name: books-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
+    volumes:
+      - ./database:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - nesjs-graphql-network
+    restart: always
+networks:
+  nesjs-graphql-network:
+    driver: bridge
